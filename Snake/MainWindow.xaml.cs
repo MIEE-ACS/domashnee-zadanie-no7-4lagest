@@ -12,12 +12,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Threading;
 
 namespace Snake
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         //Поле на котором живет змея
@@ -37,6 +35,7 @@ namespace Snake
         public MainWindow()
         {
             InitializeComponent();
+
             
             snake = new List<PositionedEntity>();
             //создаем поле 300х300 пикселей
@@ -66,10 +65,29 @@ namespace Snake
             //обновляем количество очков
             lblScore.Content = String.Format("{0}000", score);
         }
+        private DispatcherTimer timer = null;
 
+        private void timerStart()
+        {
+            timer = new DispatcherTimer();  // если надо, то в скобках указываем приоритет, например DispatcherPriority.Render
+            timer.Tick += new EventHandler(timerTick);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 10000);
+            timer.Start();
+        }
+
+        private void timerTick(object sender, EventArgs e)
+        {
+            EnableScoreBonus(10);
+        }
+        private void EnableScoreBonus(int bonus)
+        {
+            lbScoreBonus.Visibility = Visibility.Visible;
+            score += 1 * bonus;
+        }
         //обработчик тика таймера. Все движение происходит здесь
         void moveTimer_Tick(object sender, EventArgs e)
         {
+            //в обратном порядке двигаем все элементы змеи
             //в обратном порядке двигаем все элементы змеи
             foreach (var p in Enumerable.Reverse(snake))
             {
@@ -101,6 +119,7 @@ namespace Snake
             //проверяем, что голова змеи врезалась в яблоко
             if (head.x == apple.x && head.y == apple.y)
             {
+                timerStart();
                 //увеличиваем счет
                 score++;
                 //двигаем яблоко на новое место
