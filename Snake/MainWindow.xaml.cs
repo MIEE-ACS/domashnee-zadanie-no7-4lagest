@@ -66,24 +66,20 @@ namespace Snake
             lblScore.Content = String.Format("{0}000", score);
         }
         private DispatcherTimer timer = null;
-
+        int t = 0;
         private void timerStart()
         {
             timer = new DispatcherTimer();  // если надо, то в скобках указываем приоритет, например DispatcherPriority.Render
             timer.Tick += new EventHandler(timerTick);
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 10000);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
             timer.Start();
         }
 
         private void timerTick(object sender, EventArgs e)
         {
-            EnableScoreBonus(10);
+            t++;
         }
-        private void EnableScoreBonus(int bonus)
-        {
-            lbScoreBonus.Visibility = Visibility.Visible;
-            score += 1 * bonus;
-        }
+        
         //обработчик тика таймера. Все движение происходит здесь
         void moveTimer_Tick(object sender, EventArgs e)
         {
@@ -120,8 +116,25 @@ namespace Snake
             if (head.x == apple.x && head.y == apple.y)
             {
                 timerStart();
+                t = 0;
+                if (t <= 30)
+                {
+                    lbScoreBonus.Visibility = Visibility.Visible;
+                    if (head.x == apple.x && head.y == apple.y)
+                    {
+                        score += 1 * 10;
+                    }
+                }
+                else
+                {
+                    lbScoreBonus.Visibility = Visibility.Collapsed;
+                    if (head.x == apple.x && head.y == apple.y)
+                    {
+                        score++;
+                    }
+                }
                 //увеличиваем счет
-                score++;
+                //score++;
                 //двигаем яблоко на новое место
                 apple.move();
                 // добавляем новый сегмент к змее
